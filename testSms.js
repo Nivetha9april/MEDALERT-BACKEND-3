@@ -18,3 +18,13 @@ async function sendTestSMS(to, message) {
 
 // Replace with your personal number to test
 sendTestSMS('+917338949603', 'Hello from MedAlert using Twilio!');
+// testNotification.js
+const sendNotification = require("./services/fcmService");
+
+const testToken = "PASTE_YOUR_TEST_FCM_TOKEN_HERE"; // from the app
+
+sendNotification(
+  testToken,
+  "🔔 Test Notification",
+  "If you see this, it's working!"
+);

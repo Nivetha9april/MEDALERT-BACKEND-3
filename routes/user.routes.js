@@ -1,24 +1,25 @@
 const express = require("express");
 const router = express.Router();
+const auth = require("../middleware/auth");
 
-// 👇 Make sure the path and exported functions are correct
 const {
   register,
   login,
   googleLogin,
-} = require("../controllers/user.controllers"); // ✅ correct filename
-const auth = require("../middleware/auth");
-const {
   getProfile,
   updateProfile,
-} = require("../controllers/user.controllers"); // ✅ correct filename
+  saveFcmToken,
+} = require("../controllers/user.controllers");
 
-// ✅ These must be real functions
+// ✅ Routes
 router.post("/register", register);
 router.post("/login", login);
 router.post("/google-login", googleLogin);
 
 router.get("/me", auth, getProfile);
 router.put("/updateProfile", auth, updateProfile);
+
+// ✅ FCM Token route (only once)
+router.post("/fcm-token", auth, saveFcmToken); // auth recommended to associate token with user
 
 module.exports = router;

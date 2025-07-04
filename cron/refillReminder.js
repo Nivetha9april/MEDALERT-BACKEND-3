@@ -1,10 +1,9 @@
 const cron = require("node-cron");
-const axios = require("axios"); // to call Fast2SMS API
 const Medicine = require("../models/medicine.model");
 const User = require("../models/User");
 const nodemailer = require("nodemailer");
- // adjust path accordingly
 
+// ✅ Email transporter setup using Gmail
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -13,34 +12,22 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// ✅ Email sender function
 const sendEmail = async (to, subject, text) => {
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to,
-    subject,
-    text,
-  });
-};
-
-const sendSMS = async (phone, message) => {
   try {
-    const response = await axios.get("https://www.fast2sms.com/dev/bulkV2", {
-      params: {
-        authorization: process.env.FAST2SMS_API_KEY,  // your Fast2SMS API key in .env
-        variables_values: message,
-        route: "q",
-        numbers: phone,
-      },
-      headers: {
-        "cache-control": "no-cache",
-      },
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to,
+      subject,
+      text,
     });
-    console.log("SMS sent:", response.data);
-  } catch (error) {
-    console.error("Failed to send SMS:", error.response ? error.response.data : error.message);
+    console.log(`📧 Email sent to ${to}`);
+  } catch (err) {
+    console.error("❌ Email sending failed:", err.message);
   }
 };
 
+// ✅ Core function to check medicine status and send email reminders
 const checkMedicines = async () => {
   const today = new Date();
   const inThreeDays = new Date();
@@ -55,12 +42,12 @@ const checkMedicines = async () => {
 
   for (let med of meds) {
     const user = await User.findById(med.userId);
-    if (!user) continue; // safety check
-    
+    if (!user) continue;
+
     let message = `Hi ${user.name},\n\n`;
 
     if (new Date(med.expiryDate) <= inThreeDays) {
-      message += `⚠️ Your medicine "${med.name}" is expiring on ${med.expiryDate.toDateString()}\n`;
+      message += `⚠️ Your medicine "${med.name}" is expiring on ${med.expiryDate.toDateString()}.\n`;
     }
 
     if (med.quantity <= med.frequency * 2) {
@@ -69,20 +56,11 @@ const checkMedicines = async () => {
 
     message += "\nStay healthy,\n🩺 MedAlert Team";
 
-    // Send email
     await sendEmail(user.email, "💊 Medicine Reminder", message);
-
-    // Send SMS (make a simple SMS-friendly message)
-    let smsText = `Hi ${user.name}, Your medicine "${med.name}" `;
-    if (new Date(med.expiryDate) <= inThreeDays) smsText += `expires on ${med.expiryDate.toDateString()}. `;
-    if (med.quantity <= med.frequency * 2) smsText += `Quantity low: ${med.quantity} left. `;
-    smsText += "MedAlert Team";
-
-    await sendSMS(user.phone, smsText); // assume you have `phone` in User schema
   }
 };
 
-// 🕘 Schedule to run daily at 9 AM
+// 🕘 Schedule job to run every day at 9 AM
 function scheduleReminders() {
   cron.schedule("0 9 * * *", checkMedicines);
   console.log("⏰ Cron job scheduled for 9 AM daily.");
