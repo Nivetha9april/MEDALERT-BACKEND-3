@@ -4,7 +4,7 @@ require("dotenv").config();
 
 // ✅ Get full path to service account JSON
 
-const serviceAccountPath = process.env.FIREBASE_KEY_PATH || "/etc/secrets/firebase-admin-key.json";
+const serviceAccountPath = process.env.FIREBASE_KEY_PATH ;
 const serviceAccount = require(serviceAccountPath);
 
 
