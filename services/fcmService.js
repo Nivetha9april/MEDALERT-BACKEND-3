@@ -1,15 +1,19 @@
 const admin = require("firebase-admin");
 const path = require("path");
+require("dotenv").config();
 
-const serviceAccount = require(path.join(__dirname, "../firebase-admin-key.json"));
+// ✅ Get full path to service account JSON
+const serviceAccountPath = path.resolve(__dirname, "..", process.env.FIREBASE_KEY_PATH);
+const serviceAccount = require(serviceAccountPath);
 
+// ✅ Initialize Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
 const sendNotification = async (fcmToken, title, body) => {
   if (!fcmToken) {
-    console.warn("⚠️ Skipped notification: fcmToken missing.");
+    console.warn("⚠️ FCM token missing, skipping notification.");
     return;
   }
 
@@ -19,13 +23,12 @@ const sendNotification = async (fcmToken, title, body) => {
   };
 
   try {
-    const res = await admin.messaging().send(message);
-    console.log("✅ Sent to", fcmToken);
-    return res;
+    const response = await admin.messaging().send(message);
+    console.log("✅ Notification sent:", response);
+    return response;
   } catch (err) {
-    console.error("❌ FCM error:", err);
+    console.error("❌ FCM error:", err.message);
   }
 };
-
 
 module.exports = sendNotification;
