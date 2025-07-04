@@ -3,8 +3,10 @@ const path = require("path");
 require("dotenv").config();
 
 // ✅ Get full path to service account JSON
-const serviceAccountPath = path.resolve(__dirname, "..", process.env.FIREBASE_KEY_PATH);
+
+const serviceAccountPath = process.env.FIREBASE_KEY_PATH || "/etc/secrets/firebase-admin-key.json";
 const serviceAccount = require(serviceAccountPath);
+
 
 // ✅ Initialize Firebase Admin SDK
 admin.initializeApp({
