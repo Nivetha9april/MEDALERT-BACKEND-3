@@ -10,9 +10,7 @@ dotenv.config();
 const userRoutes = require("./routes/user.routes");
 const medicineRoutes = require("./routes/medicine.routes");
 const User = require("./models/User");
-app.get("/health", (req, res) => {
-  res.send("✅ Server is alive and all cron jobs are scheduled.");
-});
+
 
 // Cron Jobs
 require("./cron/reminders");
@@ -45,9 +43,12 @@ async function testNotification() {
     console.warn("⚠️ No user with FCM token found.");
     return;
   }
-  await sendNotification(user.fcmToken, "💊 MedAlert", "🔔 This is a test notification.");
+  await sendNotification(user.fcmToken, "💊 MedAlert", "🔔 WELCOME TO MEDALERT.");
 }
 
+app.get("/health", (req, res) => {
+  res.send("✅ Server is alive and all cron jobs are scheduled.");
+});
 // DB Connection
 mongoose
   .connect(process.env.MONGO_URI || "mongodb://localhost:27017/medalert", {
