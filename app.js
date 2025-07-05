@@ -10,6 +10,9 @@ dotenv.config();
 const userRoutes = require("./routes/user.routes");
 const medicineRoutes = require("./routes/medicine.routes");
 const User = require("./models/User");
+app.get("/health", (req, res) => {
+  res.send("✅ Server is alive and all cron jobs are scheduled.");
+});
 
 // Cron Jobs
 require("./cron/reminders");
