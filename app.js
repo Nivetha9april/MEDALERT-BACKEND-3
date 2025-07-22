@@ -49,6 +49,9 @@ async function testNotification() {
 app.get("/health", (req, res) => {
   res.send("✅ Server is alive and all cron jobs are scheduled.");
 });
+
+
+
 // DB Connection
 mongoose
   .connect(process.env.MONGO_URI || "mongodb://localhost:27017/medalert", {

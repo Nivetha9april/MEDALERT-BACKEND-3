@@ -26,5 +26,6 @@ function scheduleReduceQuantity() {
     }
   });
 }
+console.log("✅ Scheduled reduceQuantity cron job.");
 
 module.exports = scheduleReduceQuantity;
